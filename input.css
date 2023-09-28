@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* calculator */
+  .calculator button {
+    @apply bg-white text-gray-700 rounded-md m-1 hover:bg-gray-400 transition-all duration-300;
+  }
+  .calculator .bottom-btn {
+    @apply col-span-2 bg-blue-500 rounded-sm text-white;
+  }
+  /* end of calculator */
+}
