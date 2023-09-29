@@ -20,38 +20,53 @@ let curValue = ``;
 let lastValue = ``;
 // storing Last value,current value, type of the math operation
 const numStore = [];
+//
+let negativeCounter = 0;
 
 const computeNumbers = function (lastNum, curNum, type) {
+  // GUARD ClAUSE for when there is no number after .
+  // GUARD CLAUSE FOR WHEN INPUT IS ./ .* .- .+
+  const check = function (firstString, secondString) {
+    if (firstString === `.` || secondString === `.`) return true;
+  };
+  if (check(lastNum, curNum)) return;
+  //
   lastNum = Number(lastNum);
   curNum = Number(curNum);
+
   // GUARD CLAUSE for when user clicks without a value
   if (lastNum === 0 && curNum === 0) return;
   // storing lastNum curNum type
-  numStore.push(lastNum, curNum, type);
+  numStore.push(lastNum, type, curNum);
   console.log(numStore);
+
   // if our last Value is not empty then add them together
   // first time that function runs , last value is 0 so we need to start from second time
   if (numStore.length >= 6) {
+    let lastComputedType = numStore[numStore.length - 5];
+    let lastComputedValue = numStore[numStore.length - 3];
+    let currentComputeValue = numStore[numStore.length - 1];
+
     if (type === `=`) {
-      if (numStore[numStore.length - 4] === `+`)
+      if (numStore[numStore.length - 5] === `+`)
         lastNum =
           Number(numStore[numStore.length - 3]) +
-          Number(numStore[numStore.length - 2]);
+          Number(numStore[numStore.length - 1]);
 
-      if (numStore[numStore.length - 4] === `-`)
+      if (numStore[numStore.length - 5] === `-`)
         lastNum =
           Number(numStore[numStore.length - 3]) -
-          Number(numStore[numStore.length - 2]);
+          Number(numStore[numStore.length - 1]);
 
-      if (numStore[numStore.length - 4] === `*`)
+      if (numStore[numStore.length - 5] === `*`)
         lastNum =
           Number(numStore[numStore.length - 3]) *
-          Number(numStore[numStore.length - 2]);
+          Number(numStore[numStore.length - 1]);
 
-      if (numStore[numStore.length - 4] === `/`)
+      if (numStore[numStore.length - 5] === `/`)
         lastNum =
           Number(numStore[numStore.length - 3]) /
-          Number(numStore[numStore.length - 2]);
+          Number(numStore[numStore.length - 1]);
 
       curValue = lastNum;
       lastValue = ``;
@@ -59,25 +74,25 @@ const computeNumbers = function (lastNum, curNum, type) {
       return;
     }
 
-    if (numStore[numStore.length - 4] === `+`)
+    if (numStore[numStore.length - 5] === `+`)
       lastNum =
         Number(numStore[numStore.length - 3]) +
-        Number(numStore[numStore.length - 2]);
+        Number(numStore[numStore.length - 1]);
 
-    if (numStore[numStore.length - 4] === `-`)
+    if (numStore[numStore.length - 5] === `-`)
       lastNum =
         Number(numStore[numStore.length - 3]) -
-        Number(numStore[numStore.length - 2]);
+        Number(numStore[numStore.length - 1]);
 
-    if (numStore[numStore.length - 4] === `*`)
+    if (numStore[numStore.length - 5] === `*`)
       lastNum =
         Number(numStore[numStore.length - 3]) *
-        Number(numStore[numStore.length - 2]);
+        Number(numStore[numStore.length - 1]);
 
-    if (numStore[numStore.length - 4] === `/`)
+    if (numStore[numStore.length - 5] === `/`)
       lastNum =
         Number(numStore[numStore.length - 3]) /
-        Number(numStore[numStore.length - 2]);
+        Number(numStore[numStore.length - 1]);
 
     curValue = ``;
     lastValue = lastNum;
@@ -86,17 +101,15 @@ const computeNumbers = function (lastNum, curNum, type) {
   // the first function runs
   // + - we add or decrease current number to 0
   // / * we use 1 for the first time because the first time that function runs our last Value is 0
-  if (type === `*`) lastNum = Number(curNum) * 1;
-  if (type === `/`) lastNum = Number(curNum) / 1;
-  if (type === `+`) lastNum = Number(lastNum) + Number(curNum);
-  if (type === `-`) lastNum = Number(curNum) - Number(lastNum);
+  if (type === `*`) lastNum = Number(curNum);
+  if (type === `/`) lastNum = Number(curNum);
+  if (type === `+`) lastNum = Number(curNum);
+  if (type === `-`) lastNum = Number(curNum);
 
   // make curValue empty and store the value inside lastValue
   curValue = ``;
   lastValue = lastNum;
 };
-
-// console.log(computeNumbers(0, 5, `/`));
 
 const calcInit = function (e) {
   e.preventDefault();
@@ -108,8 +121,9 @@ const calcInit = function (e) {
   if (e.target.tagName !== `BUTTON`) return;
 
   // insert the numbers inside DOM as a string
-  if (targetAttribute === `number`) {
+  if (targetAttribute === `number` || targetAttribute === `-`) {
     curValue += targetInnerText;
+    targetInnerText.includes(`-`) ? (negativeCounter += 1) : ``;
   }
 
   // RESET
@@ -117,16 +131,47 @@ const calcInit = function (e) {
     curValue = ``;
     lastValue = ``;
     numStore.splice(0, numStore.length);
+    negativeCounter = 0;
   }
 
   // DELETE - delete last number
   if (targetAttribute === `del`) {
+    curValue = `${curValue}`;
     curValue = curValue.slice(0, curValue.length - 1);
   }
 
   // + * - / =
+
+  // when its a negative number at start like -12 - 10 = -2
+  const negativeCheckerOutput = function (numOutput) {
+    if (typeof numOutput === `number`) return;
+
+    const negativeCount = numOutput.split(``).reduce((acc, val) => {
+      val === `-` ? (acc += 1) : acc;
+      return acc;
+    }, 0);
+
+    if (negativeCount === 2) {
+      numOutput = numOutput.replaceAll(`-`, ``);
+      numOutput = Number(-numOutput);
+      computeNumbers(lastValue, numOutput, `-`);
+    }
+  };
+  negativeCheckerOutput(curValue);
+
+  if (targetAttribute === `-` && curValue[0] === `-` && negativeCounter === 2) {
+    curValue = curValue.replaceAll(`-`, ``);
+    curValue = Number(-curValue);
+    negativeCounter = 0;
+    computeNumbers(lastValue, curValue, `-`);
+  }
+
+  // when its a positive number minus  12 - 10 = 2
+  if (targetAttribute === `-` && curValue[0] !== `-`) {
+    curValue = curValue.replaceAll(`-`, ``);
+    computeNumbers(lastValue, curValue, `-`);
+  }
   if (targetAttribute === `*`) computeNumbers(lastValue, curValue, `*`);
-  if (targetAttribute === `-`) computeNumbers(lastValue, curValue, `-`);
   if (targetAttribute === `+`) computeNumbers(lastValue, curValue, `+`);
   if (targetAttribute === `/`) computeNumbers(lastValue, curValue, `/`);
   if (targetAttribute === `=`) computeNumbers(lastValue, curValue, `=`);
