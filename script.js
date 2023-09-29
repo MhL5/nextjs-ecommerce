@@ -26,6 +26,7 @@ let negativeCounter = 0;
 const computeNumbers = function (lastNum, curNum, type) {
   // GUARD ClAUSE for when there is no number after .
   // GUARD CLAUSE FOR WHEN INPUT IS ./ .* .- .+
+  // console.log(lastNum, curNum);
   const check = function (firstString, secondString) {
     if (firstString === `.` || secondString === `.`) return true;
   };
@@ -38,7 +39,7 @@ const computeNumbers = function (lastNum, curNum, type) {
   if (lastNum === 0 && curNum === 0) return;
   // storing lastNum curNum type
   numStore.push(lastNum, type, curNum);
-  console.log(numStore);
+  // console.log(numStore);
 
   // if our last Value is not empty then add them together
   // first time that function runs , last value is 0 so we need to start from second time
@@ -91,6 +92,7 @@ const computeNumbers = function (lastNum, curNum, type) {
   if (type === `-`) lastNum = Number(curNum);
 
   // make curValue empty and store the value inside lastValue
+  negativeCounter = 0;
   curValue = ``;
   lastValue = lastNum;
 };
@@ -128,6 +130,8 @@ const calcInit = function (e) {
 
   // when its a negative number at start like -12 - 10 = -2
   const negativeCheckerOutput = function (numOutput) {
+    console.log(lastValue, numOutput);
+
     if (typeof numOutput === `number`) return;
 
     const negativeCount = numOutput.split(``).reduce((acc, val) => {
@@ -141,9 +145,11 @@ const calcInit = function (e) {
       computeNumbers(lastValue, numOutput, `-`);
     }
   };
+
   negativeCheckerOutput(curValue);
 
   if (targetAttribute === `-` && curValue[0] === `-` && negativeCounter === 2) {
+    console.log(`true`);
     curValue = curValue.replaceAll(`-`, ``);
     curValue = Number(-curValue);
     negativeCounter = 0;
