@@ -48,25 +48,17 @@ const computeNumbers = function (lastNum, curNum, type) {
     let currentComputeValue = numStore[numStore.length - 1];
 
     if (type === `=`) {
-      if (numStore[numStore.length - 5] === `+`)
-        lastNum =
-          Number(numStore[numStore.length - 3]) +
-          Number(numStore[numStore.length - 1]);
+      if (lastComputedType === `+`)
+        lastNum = Number(lastComputedValue) + Number(currentComputeValue);
 
-      if (numStore[numStore.length - 5] === `-`)
-        lastNum =
-          Number(numStore[numStore.length - 3]) -
-          Number(numStore[numStore.length - 1]);
+      if (lastComputedType === `-`)
+        lastNum = Number(lastComputedValue) - Number(currentComputeValue);
 
-      if (numStore[numStore.length - 5] === `*`)
-        lastNum =
-          Number(numStore[numStore.length - 3]) *
-          Number(numStore[numStore.length - 1]);
+      if (lastComputedType === `*`)
+        lastNum = Number(lastComputedValue) * Number(currentComputeValue);
 
-      if (numStore[numStore.length - 5] === `/`)
-        lastNum =
-          Number(numStore[numStore.length - 3]) /
-          Number(numStore[numStore.length - 1]);
+      if (lastComputedType === `/`)
+        lastNum = Number(lastComputedValue) / Number(currentComputeValue);
 
       curValue = lastNum;
       lastValue = ``;
@@ -74,25 +66,17 @@ const computeNumbers = function (lastNum, curNum, type) {
       return;
     }
 
-    if (numStore[numStore.length - 5] === `+`)
-      lastNum =
-        Number(numStore[numStore.length - 3]) +
-        Number(numStore[numStore.length - 1]);
+    if (lastComputedType === `+`)
+      lastNum = Number(lastComputedValue) + Number(currentComputeValue);
 
-    if (numStore[numStore.length - 5] === `-`)
-      lastNum =
-        Number(numStore[numStore.length - 3]) -
-        Number(numStore[numStore.length - 1]);
+    if (lastComputedType === `-`)
+      lastNum = Number(lastComputedValue) - Number(currentComputeValue);
 
-    if (numStore[numStore.length - 5] === `*`)
-      lastNum =
-        Number(numStore[numStore.length - 3]) *
-        Number(numStore[numStore.length - 1]);
+    if (lastComputedType === `*`)
+      lastNum = Number(lastComputedValue) * Number(currentComputeValue);
 
-    if (numStore[numStore.length - 5] === `/`)
-      lastNum =
-        Number(numStore[numStore.length - 3]) /
-        Number(numStore[numStore.length - 1]);
+    if (lastComputedType === `/`)
+      lastNum = Number(lastComputedValue) / Number(currentComputeValue);
 
     curValue = ``;
     lastValue = lastNum;
