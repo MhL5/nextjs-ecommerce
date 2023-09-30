@@ -1,16 +1,10 @@
 "use strict";
 
-const themeCheckboxElement = document.getElementById(`theme-checkbox`);
-const themeToggleDotElement = document.getElementById(`theme-toggle-dot`);
+import "./theme.js";
+
 const btnContainer = document.getElementById(`calculator-btn-container`);
 const numOutput = document.getElementById(`output-num`);
 const lastComputedValue = document.getElementById(`last-value-store`);
-
-const toggleTheme = function () {
-  themeToggleDotElement.classList.toggle(`translate-x-5`);
-  themeToggleDotElement.classList.toggle(`-translate-x-5`);
-};
-themeCheckboxElement.addEventListener(`click`, toggleTheme);
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,9 +20,16 @@ let negativeCounter = 0;
 const computeNumbers = function (lastNum, curNum, type) {
   // GUARD ClAUSE for when there is no number after .
   // GUARD CLAUSE FOR WHEN INPUT IS ./ .* .- .+
-  // console.log(lastNum, curNum);
+  console.log(lastNum);
+  console.log(curNum);
   const check = function (firstString, secondString) {
-    if (firstString === `.` || secondString === `.`) return true;
+    if (
+      firstString === `.` ||
+      secondString === `.` ||
+      firstString === `-` ||
+      secondString === `-`
+    )
+      return true;
   };
   if (check(lastNum, curNum)) return;
   //
@@ -61,6 +62,7 @@ const computeNumbers = function (lastNum, curNum, type) {
       if (lastComputedType === `/`)
         lastNum = Number(lastComputedValue) / Number(currentComputeValue);
 
+      negativeCounter = 0;
       curValue = lastNum;
       lastValue = ``;
       numStore.splice(0, numStore.length);
@@ -79,6 +81,7 @@ const computeNumbers = function (lastNum, curNum, type) {
     if (lastComputedType === `/`)
       lastNum = Number(lastComputedValue) / Number(currentComputeValue);
 
+    negativeCounter = 0;
     curValue = ``;
     lastValue = lastNum;
     return;
@@ -130,8 +133,6 @@ const calcInit = function (e) {
 
   // when its a negative number at start like -12 - 10 = -2
   const negativeCheckerOutput = function (numOutput) {
-    console.log(lastValue, numOutput);
-
     if (typeof numOutput === `number`) return;
 
     const negativeCount = numOutput.split(``).reduce((acc, val) => {
@@ -149,7 +150,6 @@ const calcInit = function (e) {
   negativeCheckerOutput(curValue);
 
   if (targetAttribute === `-` && curValue[0] === `-` && negativeCounter === 2) {
-    console.log(`true`);
     curValue = curValue.replaceAll(`-`, ``);
     curValue = Number(-curValue);
     negativeCounter = 0;
@@ -157,7 +157,8 @@ const calcInit = function (e) {
   }
 
   // when its a positive number minus  12 - 10 = 2
-  if (targetAttribute === `-` && curValue[0] !== `-`) {
+  if (targetAttribute === `-` && curValue[0] !== `-` && curValue !== -0) {
+    console.log(curValue);
     curValue = curValue.replaceAll(`-`, ``);
     computeNumbers(lastValue, curValue, `-`);
   }

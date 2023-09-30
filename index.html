@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,30 +7,29 @@
     <!-- tailwind css -->
     <link rel="stylesheet" href="./dist/output.css" />
     <!-- js -->
-    <script src="./script.js" defer></script>
+    <script src="./script.js" type="module"></script>
   </head>
   <body class="font-sans">
     <!-- main container -->
     <div
-      class="min-h-screen dark:bg-gray-800 flex-col flex justify-center items-center"
+      class="min-h-screen dark:bg-gray-800 flex-col flex justify-center items-center bg-gray-400"
     >
       <!-- title and theme button container -->
       <div class="flex w-96 p-1 mb-2 dark:text-white font-bold">
         <h1 class="mr-auto capitalize">calc</h1>
         <div class="ml-auto flex gap-4">
           THEME
-          <button class="flex">
-            <input type="checkbox" name="" id="theme-checkbox" class="hidden" />
-            <label
+          <button class="flex" id="theme-button">
+            <!-- <input type="checkbox" name="" id="theme-checkbox" class="hidden" /> -->
+            <div
               id="label-theme-toggle"
-              for="theme-checkbox"
               class="bg-blue-900 px-5 rounded-full cursor-pointer"
             >
               <div
                 id="theme-toggle-dot"
-                class="text-white p-2 m-1 bg-white rounded-full translate-x-5 transition-all duration-300"
+                class="p-2 m-1 bg-white rounded-full transition-all duration-300"
               ></div>
-            </label>
+            </div>
           </button>
         </div>
       </div>
