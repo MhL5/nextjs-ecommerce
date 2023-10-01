@@ -10,44 +10,49 @@ const lastComputedValue = document.getElementById(`last-value-store`);
 
 // Storing current value
 let curValue = ``;
-// store the last value we had
+// store the last computed value we had
 let lastValue = ``;
 // storing Last value,current value, type of the math operation
-const numStore = [];
-//
+const calcHistory = [];
+// counter for when user input more than one -
 let negativeCounter = 0;
 
+// compute numbers
 const computeNumbers = function (lastNum, curNum, type) {
-  // GUARD ClAUSE for when there is no number after .
-  // GUARD CLAUSE FOR WHEN INPUT IS ./ .* .- .+
-  console.log(lastNum);
-  console.log(curNum);
+  // GUARD CLAUSE FOR WHEN INPUT IS . -
+  // it happens when user clicks on other operations after . and - without value
   const check = function (firstString, secondString) {
     if (
       firstString === `.` ||
-      secondString === `.` ||
       firstString === `-` ||
+      secondString === `.` ||
       secondString === `-`
     )
       return true;
   };
   if (check(lastNum, curNum)) return;
-  //
+
+  // turn lastNum and curNum into a number
   lastNum = Number(lastNum);
   curNum = Number(curNum);
 
-  // GUARD CLAUSE for when user clicks without a value
-  if (lastNum === 0 && curNum === 0) return;
-  // storing lastNum curNum type
-  numStore.push(lastNum, type, curNum);
-  // console.log(numStore);
+  console.log(curNum === -0);
+  // GUARD CLAUSE for when user clicks without a value - we need to check for this after converting lastNum and curNum to a number
+  if ((lastNum === 0 && curNum === 0) || curNum === -0) {
+    deleteLastWord();
+    return;
+  }
+
+  // storing history
+  calcHistory.push(lastNum, type, curNum);
+  console.log(calcHistory);
 
   // if our last Value is not empty then add them together
   // first time that function runs , last value is 0 so we need to start from second time
-  if (numStore.length >= 6) {
-    let lastComputedType = numStore[numStore.length - 5];
-    let lastComputedValue = numStore[numStore.length - 3];
-    let currentComputeValue = numStore[numStore.length - 1];
+  if (calcHistory.length >= 6) {
+    let lastComputedType = calcHistory[calcHistory.length - 5];
+    let lastComputedValue = calcHistory[calcHistory.length - 3];
+    let currentComputeValue = calcHistory[calcHistory.length - 1];
 
     if (type === `=`) {
       if (lastComputedType === `+`)
@@ -65,7 +70,7 @@ const computeNumbers = function (lastNum, curNum, type) {
       negativeCounter = 0;
       curValue = lastNum;
       lastValue = ``;
-      numStore.splice(0, numStore.length);
+      calcHistory.splice(0, calcHistory.length);
       return;
     }
 
@@ -100,68 +105,84 @@ const computeNumbers = function (lastNum, curNum, type) {
   lastValue = lastNum;
 };
 
+// processNumberValues - Display the values inside DOM and store them
+const processNumberValues = function (input) {
+  curValue += input;
+  input.includes(`-`) ? (negativeCounter += 1) : ``;
+};
+
+//  RESET BUTTON
+const reset = function () {
+  curValue = ``;
+  lastValue = ``;
+  calcHistory.splice(0, calcHistory.length);
+  negativeCounter = 0;
+};
+
+// Delete button
+const deleteLastWord = function () {
+  curValue = `${curValue}`;
+  curValue = curValue.slice(0, curValue.length - 1);
+};
+
+//  NEGATIVE NUMBERS
+const negativeCheckerInput = function (numOutput, targetAttribute) {
+  // Guard clause
+  if (typeof numOutput === `number`) return;
+  if (numOutput === `--`) numOutput.slice(0, numOutput.length - 1);
+  // check if we have two -
+  const negativeCount = numOutput.split(``).reduce((acc, val) => {
+    val === `-` ? (acc += 1) : acc;
+    return acc;
+  }, 0);
+  // remove the second -
+  if (negativeCount === 2 && numOutput !== `--`) {
+    numOutput = numOutput.replaceAll(`-`, ``);
+    numOutput = Number(-numOutput);
+    computeNumbers(lastValue, numOutput, `-`);
+    return;
+  }
+
+  // call the function after getting second - input
+  if (targetAttribute === `-` && curValue[0] === `-` && negativeCounter === 2) {
+    curValue = curValue.replaceAll(`-`, ``);
+    curValue = Number(-curValue);
+    negativeCounter = 0;
+    computeNumbers(lastValue, curValue, `-`);
+    return;
+  }
+
+  // when its a positive number minus  12 - 10 = 2
+  if (targetAttribute === `-` && curValue[0] !== `-` && curValue !== -0) {
+    curValue = curValue.replaceAll(`-`, ``);
+    computeNumbers(lastValue, curValue, `-`);
+    return;
+  }
+};
+
+//
 const calcInit = function (e) {
   e.preventDefault();
   const targetInnerText = e.target.innerText;
 
   const targetAttribute = e.target.getAttribute(`data-value`);
 
-  // Guard clause if its not a button return
+  // Guard clause if its not a button element return
   if (e.target.tagName !== `BUTTON`) return;
 
   // insert the numbers inside DOM as a string
-  if (targetAttribute === `number` || targetAttribute === `-`) {
-    curValue += targetInnerText;
-    targetInnerText.includes(`-`) ? (negativeCounter += 1) : ``;
-  }
+  if (targetAttribute === `number` || targetAttribute === `-`)
+    processNumberValues(targetInnerText);
 
   // RESET
-  if (targetAttribute === `reset`) {
-    curValue = ``;
-    lastValue = ``;
-    numStore.splice(0, numStore.length);
-    negativeCounter = 0;
-  }
+  if (targetAttribute === `reset`) reset();
 
   // DELETE - delete last number
-  if (targetAttribute === `del`) {
-    curValue = `${curValue}`;
-    curValue = curValue.slice(0, curValue.length - 1);
-  }
+  if (targetAttribute === `del`) deleteLastWord();
 
   // + * - / =
-
   // when its a negative number at start like -12 - 10 = -2
-  const negativeCheckerOutput = function (numOutput) {
-    if (typeof numOutput === `number`) return;
-
-    const negativeCount = numOutput.split(``).reduce((acc, val) => {
-      val === `-` ? (acc += 1) : acc;
-      return acc;
-    }, 0);
-
-    if (negativeCount === 2) {
-      numOutput = numOutput.replaceAll(`-`, ``);
-      numOutput = Number(-numOutput);
-      computeNumbers(lastValue, numOutput, `-`);
-    }
-  };
-
-  negativeCheckerOutput(curValue);
-
-  if (targetAttribute === `-` && curValue[0] === `-` && negativeCounter === 2) {
-    curValue = curValue.replaceAll(`-`, ``);
-    curValue = Number(-curValue);
-    negativeCounter = 0;
-    computeNumbers(lastValue, curValue, `-`);
-  }
-
-  // when its a positive number minus  12 - 10 = 2
-  if (targetAttribute === `-` && curValue[0] !== `-` && curValue !== -0) {
-    console.log(curValue);
-    curValue = curValue.replaceAll(`-`, ``);
-    computeNumbers(lastValue, curValue, `-`);
-  }
+  negativeCheckerInput(curValue, targetAttribute); //              `-`
   if (targetAttribute === `*`) computeNumbers(lastValue, curValue, `*`);
   if (targetAttribute === `+`) computeNumbers(lastValue, curValue, `+`);
   if (targetAttribute === `/`) computeNumbers(lastValue, curValue, `/`);
