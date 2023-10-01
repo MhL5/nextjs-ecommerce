@@ -1,6 +1,6 @@
 "use strict";
 
-import "./theme.js";
+// import "./theme.js";
 
 const btnContainer = document.getElementById(`calculator-btn-container`);
 const numOutput = document.getElementById(`output-num`);
@@ -21,22 +21,13 @@ let negativeCounter = 0;
 const computeNumbers = function (lastNum, curNum, type) {
   // GUARD CLAUSE FOR WHEN INPUT IS . -
   // it happens when user clicks on other operations after . and - without value
-  const check = function (firstString, secondString) {
-    if (
-      firstString === `.` ||
-      firstString === `-` ||
-      secondString === `.` ||
-      secondString === `-`
-    )
-      return true;
-  };
-  if (check(lastNum, curNum)) return;
+  if (lastNum === `.` || lastNum === `-`) return;
+  if (curNum === `.` || curNum === `-`) return;
 
   // turn lastNum and curNum into a number
   lastNum = Number(lastNum);
   curNum = Number(curNum);
 
-  console.log(curNum === -0);
   // GUARD CLAUSE for when user clicks without a value - we need to check for this after converting lastNum and curNum to a number
   if ((lastNum === 0 && curNum === 0) || curNum === -0) {
     deleteLastWord();
@@ -56,16 +47,16 @@ const computeNumbers = function (lastNum, curNum, type) {
 
     if (type === `=`) {
       if (lastComputedType === `+`)
-        lastNum = Number(lastComputedValue) + Number(currentComputeValue);
+        lastNum = lastComputedValue + currentComputeValue;
 
       if (lastComputedType === `-`)
-        lastNum = Number(lastComputedValue) - Number(currentComputeValue);
+        lastNum = lastComputedValue - currentComputeValue;
 
       if (lastComputedType === `*`)
-        lastNum = Number(lastComputedValue) * Number(currentComputeValue);
+        lastNum = lastComputedValue * currentComputeValue;
 
       if (lastComputedType === `/`)
-        lastNum = Number(lastComputedValue) / Number(currentComputeValue);
+        lastNum = lastComputedValue / currentComputeValue;
 
       negativeCounter = 0;
       curValue = lastNum;
@@ -75,16 +66,16 @@ const computeNumbers = function (lastNum, curNum, type) {
     }
 
     if (lastComputedType === `+`)
-      lastNum = Number(lastComputedValue) + Number(currentComputeValue);
+      lastNum = lastComputedValue + currentComputeValue;
 
     if (lastComputedType === `-`)
-      lastNum = Number(lastComputedValue) - Number(currentComputeValue);
+      lastNum = lastComputedValue - currentComputeValue;
 
     if (lastComputedType === `*`)
-      lastNum = Number(lastComputedValue) * Number(currentComputeValue);
+      lastNum = lastComputedValue * currentComputeValue;
 
     if (lastComputedType === `/`)
-      lastNum = Number(lastComputedValue) / Number(currentComputeValue);
+      lastNum = lastComputedValue / currentComputeValue;
 
     negativeCounter = 0;
     curValue = ``;
@@ -98,6 +89,13 @@ const computeNumbers = function (lastNum, curNum, type) {
   if (type === `/`) lastNum = Number(curNum);
   if (type === `+`) lastNum = Number(curNum);
   if (type === `-`) lastNum = Number(curNum);
+  if (type === `=`) {
+    negativeCounter = 0;
+    curValue = curNum;
+    lastValue = ``;
+    calcHistory.splice(0, calcHistory.length);
+    return;
+  }
 
   // make curValue empty and store the value inside lastValue
   negativeCounter = 0;
@@ -109,6 +107,11 @@ const computeNumbers = function (lastNum, curNum, type) {
 const processNumberValues = function (input) {
   curValue += input;
   input.includes(`-`) ? (negativeCounter += 1) : ``;
+  // remove the second .
+  const numberAllowed = curValue
+    .split(``)
+    .reduce((acc, val) => (val === `.` ? (acc += 1) : acc), 0);
+  if (numberAllowed > 1) deleteLastWord();
 };
 
 //  RESET BUTTON
@@ -159,7 +162,14 @@ const negativeCheckerInput = function (numOutput, targetAttribute) {
     return;
   }
 };
-
+// last operation Display
+const lastOperationDisplay = function () {
+  let lastOperation = calcHistory[calcHistory.length - 2];
+  if (typeof lastOperation !== `undefined`) return lastOperation;
+  //  else
+  return (lastOperation = ``);
+};
+console.log(lastOperationDisplay());
 //
 const calcInit = function (e) {
   e.preventDefault();
@@ -188,9 +198,12 @@ const calcInit = function (e) {
   if (targetAttribute === `/`) computeNumbers(lastValue, curValue, `/`);
   if (targetAttribute === `=`) computeNumbers(lastValue, curValue, `=`);
 
+  // last operation display
+  lastOperationDisplay();
+
   // render the values inside DOM
   numOutput.innerText = curValue;
-  lastComputedValue.innerText = lastValue;
+  lastComputedValue.innerText = `${lastValue} ${lastOperationDisplay()}`;
 };
 
 btnContainer.addEventListener(`click`, calcInit);
