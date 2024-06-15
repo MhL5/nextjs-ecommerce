@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import AddToCartButton from "./AddToCartButton";
 
 type PageProps = {
   params: { productId: string };
@@ -31,26 +32,27 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: PageProps) {
-  const { imageUrl, name, description, price } = await getProducts(
-    params.productId,
-  );
+export default async function Page({ params: { productId } }: PageProps) {
+  const { imageUrl, name, description, price } = await getProducts(productId);
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-      <Image
-        src={imageUrl}
-        alt={name}
-        width={500}
-        height={500}
-        className="rounded-lg"
-        priority
-      />
+      <div>
+        <Image
+          src={imageUrl}
+          alt={name}
+          width={500}
+          height={500}
+          className="rounded-lg"
+          priority
+        />
+      </div>
 
       <div>
         <h1 className="text-5xl font-bold">{name}</h1>
         <PriceTag price={price} className="badge badge-primary mt-4" />
         <p className="py-6">{description}</p>
+        <AddToCartButton productId={productId} />
       </div>
     </div>
   );
