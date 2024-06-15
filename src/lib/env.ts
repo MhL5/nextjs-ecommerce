@@ -12,6 +12,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string({
     message: "DATABASE_URL env variable is missing.💀",
   }),
+  DOMAIN: z.string().url({ message: "DOMAIN should be a valid url" }),
 });
 
 /**
