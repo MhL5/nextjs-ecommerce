@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { env } from "@/lib/env";
 
 type RootLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -9,6 +10,10 @@ type RootLayoutProps = Readonly<{
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  // temp solution:
+  // have to be hard coded because of this error:
+  // metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+  metadataBase: new URL(env.DOMAIN),
   title: {
     template: "Ecommerce | %s",
     default: "ecommerce",
