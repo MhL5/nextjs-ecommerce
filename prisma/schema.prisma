@@ -35,7 +35,7 @@ model CartItem {
   quantity  Int
   cartId    String  @db.ObjectId
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  cart      Cart    @relation(fields: [cartId], references: [id])
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   @@map("cartItem")
 }
