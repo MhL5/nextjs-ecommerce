@@ -9,10 +9,10 @@ import { z } from "zod";
  */
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production"]),
-  DATABASE_URL: z.string({
-    message: "DATABASE_URL env variable is missing.💀",
-  }),
-  DOMAIN: z.string().url({ message: "DOMAIN should be a valid url" }),
+  DATABASE_URL: z.string().min(1),
+  DOMAIN: z.string().url({ message: "DOMAIN should be a valid url" }).min(1),
+  AUTH_GOOGLE_ID: z.string().min(1),
+  AUTH_GOOGLE_SECRET: z.string().min(1),
 });
 
 /**
