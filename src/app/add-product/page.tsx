@@ -1,11 +1,16 @@
 import { createProduct } from "@/actions/productActions";
 import FormSubmitButton from "@/components/FormSubmitButton";
+import { auth } from "../../../auth";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "add product",
 };
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
+
+  if (!session) redirect("/api/auth/signin?callbackUrl=/add-product");
   return (
     <div>
       <h1 className="mb-3 text-lg font-bold">add product</h1>
