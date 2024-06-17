@@ -4,6 +4,8 @@ import logoImg from "@/assets/logo.png";
 import { redirect } from "next/navigation";
 import { getCart } from "@/lib/db/cart";
 import ShoppingCartButton from "../ShoppingCartButton";
+import UserMenuButton from "../UserMenuButton";
+import { auth } from "../../../auth";
 
 async function searchProducts(formData: FormData) {
   "use server";
@@ -13,6 +15,8 @@ async function searchProducts(formData: FormData) {
 
 export default async function Navbar() {
   const cart = await getCart();
+
+  const session = await auth();
 
   return (
     <nav className="bg-base-200">
@@ -37,6 +41,7 @@ export default async function Navbar() {
           </form>
 
           <ShoppingCartButton cart={cart} />
+          <UserMenuButton session={session} />
         </div>
       </div>
     </nav>
