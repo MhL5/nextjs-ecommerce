@@ -9,8 +9,19 @@ declare const globalThis: {
   prismaGlobal: ReturnType<typeof prismaClientSingleton>;
 } & typeof global;
 
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+const prismaBase = globalThis.prismaGlobal ?? prismaClientSingleton();
+
+const prisma = prismaBase.$extends({
+  query: {
+    cart: {
+      async update({ args, query }) {
+        args.data = { ...args.data, updatedAt: new Date() };
+        return query(args);
+      },
+    },
+  },
+});
+
+if (env.NODE_ENV !== "production") globalThis.prismaGlobal = prismaBase;
 
 export default prisma;
-
-if (env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;

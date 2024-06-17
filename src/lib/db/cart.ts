@@ -78,23 +78,30 @@ export async function mergeAnonymousCartIntoUserCart(userId: string) {
     include: { items: true },
   });
 
-  await prisma.$transaction(async (xt) => {
+  await prisma.$transaction(async (tx) => {
     if (userCart) {
       const mergedCartItems = mergeCartItems(
         anonymousCart.items,
         userCart.items,
       );
 
-      await xt.cartItem.deleteMany({ where: { cartId: userCart.id } });
-      await xt.cartItem.createMany({
-        data: mergedCartItems.map((item) => ({
-          cartId: userCart.id,
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
+      await tx.cartItem.deleteMany({ where: { cartId: userCart.id } });
+
+      await tx.cart.update({
+        where: { id: userCart.id },
+        data: {
+          items: {
+            createMany: {
+              data: mergedCartItems.map((item) => ({
+                productId: item.productId,
+                quantity: item.quantity,
+              })),
+            },
+          },
+        },
       });
     } else {
-      await xt.cart.create({
+      await tx.cart.create({
         data: {
           userId,
           items: {
@@ -109,7 +116,7 @@ export async function mergeAnonymousCartIntoUserCart(userId: string) {
       });
     }
 
-    await xt.cart.delete({ where: { id: anonymousCart.id } });
+    await tx.cart.delete({ where: { id: anonymousCart.id } });
     cookies().set("localCartId", "");
   });
 }
